@@ -43,7 +43,7 @@ func Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// add user
-	var u user.User
+	var u *user.User
 	if u, err = user.NewUser(name, password, email); err != nil {
 		// hide the actual error since it might contain sensitive data
 		err = fmt.Errorf("create user failed, cause=%w", err)

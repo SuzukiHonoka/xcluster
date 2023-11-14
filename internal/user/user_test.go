@@ -83,12 +83,12 @@ func TestID_GetUser(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, user := range all {
-		var u User
+		var u *User
 		u, err = user.ID.GetUser()
 		if err != nil {
 			t.Fatal(err)
 		}
-		if u != user {
+		if *u != *user {
 			t.Fatalf("integrity check failed, original user=%+v, actuall user=%+v", user, u)
 		}
 	}
@@ -100,12 +100,12 @@ func TestName_GetUser(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, user := range all {
-		var u User
+		var u *User
 		u, err = user.Name.GetUser()
 		if err != nil {
 			t.Error(err)
 		}
-		if u != user {
+		if *u != *user {
 			t.Fatalf("integrity check failed, original user=%+v, actuall user=%+v", user, u)
 		}
 	}
@@ -143,12 +143,12 @@ func TestID_DeleteUser(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, user := range all {
-		var u User
+		var u *User
 		u, err = user.ID.GetUser()
 		if err != nil {
 			t.Fatal(err)
 		}
-		if u != user {
+		if *u != *user {
 			t.Fatalf("integrity check failed, original user=%+v, actuall user=%+v", user, u)
 		}
 	}

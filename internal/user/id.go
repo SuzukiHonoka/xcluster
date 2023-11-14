@@ -7,15 +7,15 @@ import (
 
 type ID uint
 
-func (id ID) GetUser() (User, error) {
+func (id ID) GetUser() (*User, error) {
 	if id == 0 {
-		return User{}, errors.New("uid 0 is not allowed")
+		return nil, errors.New("uid 0 is not allowed")
 	}
 	var user User
 	if err := database.DB.First(&user, id).Error; err != nil {
-		return User{}, err
+		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }
 
 func (id ID) DeleteUser() error {

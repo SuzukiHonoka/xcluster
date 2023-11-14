@@ -32,12 +32,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		logger.LogIfError(err)
 		return
 	}
-	var u user.User
+	var u *user.User
 	u, err = user.Name(name).GetUser()
 	if err != nil {
 		err = api.Write(w, api.Response{
 			Code:    http.StatusBadRequest,
-			Message: "fields can not be empty",
+			Message: "user not found",
 		})
 		logger.LogIfError(err)
 		return

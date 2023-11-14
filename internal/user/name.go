@@ -6,10 +6,10 @@ import (
 
 type Name string
 
-func (n Name) GetUser() (User, error) {
+func (n Name) GetUser() (*User, error) {
 	var user User
 	if err := database.DB.First(&user, "name = ?", n).Error; err != nil {
-		return User{}, err
+		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }
