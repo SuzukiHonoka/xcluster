@@ -8,6 +8,7 @@ import (
 func main() {
 	server := flag.Bool("s", false, "server mode")
 	client := flag.Bool("c", false, "client mode")
+	flag.Parse()
 	switch {
 	case *server:
 		launch.Server()
