@@ -27,7 +27,7 @@ func NewUser(name, password, email string) (*User, error) {
 		Group:    1,
 	}
 	// add to database
-	if err = database.DB.Create(&user).Error; err != nil {
+	if err = database.DB.Create(user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
