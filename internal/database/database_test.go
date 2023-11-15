@@ -6,19 +6,24 @@ import (
 )
 
 var (
-	addr     = "127.0.0.1:3306"
-	user     = "root"
-	password = "root"
-	name     = "database_test"
+	databaseAddr     = "127.0.0.1:3306"
+	databaseUser     = "root"
+	databasePassword = "root"
+	databaseName     = "database_test"
 )
 
+var db *Database
+
 func TestNewDatabase(t *testing.T) {
-	config := NewConfig(addr, user, password, name)
-	db, err := NewDatabase(config, true)
-	if err != nil {
+	config := NewConfig(databaseAddr, databaseUser, databasePassword, databaseName)
+	var err error
+	if db, err = NewDatabase(config, true); err != nil {
 		t.Fatal(err)
 	}
-	sql := fmt.Sprintf("DROP DATABASE %s", config.DatabaseName)
+}
+
+func TestCleanup(t *testing.T) {
+	sql := fmt.Sprintf("DROP DATABASE %s", databaseName)
 	mdb, err := db.Exec(sql).DB()
 	if err != nil {
 		t.Fatal(err)
