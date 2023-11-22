@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"xcluster/internal/api"
+	"xcluster/internal/api/filter"
 )
 
-const logger = api.Logger("user/logout")
-
 func Logout(w http.ResponseWriter, r *http.Request) {
+	if !filter.MatchMethod(w, r, http.MethodGet) {
+		return
+	}
 	// parse session
 	session, _ := api.GetSession(r)
 	err := session.Delete()
@@ -33,6 +35,6 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		Message: "logout success",
 	})
 	logger.LogIfError(err)
-	msg := fmt.Sprintf("session: %s (tenantID %d) deleted", session.ID, session.Lease.TenantID)
+	msg := fmt.Sprintln(session.ShortString(), "deleted")
 	logger.Log(msg)
 }

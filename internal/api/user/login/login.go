@@ -3,33 +3,25 @@ package login
 import (
 	"fmt"
 	"net/http"
-	"time"
 	"xcluster/internal/api"
+	"xcluster/internal/api/filter"
 	options "xcluster/internal/api/user"
 	"xcluster/internal/session"
 	"xcluster/internal/user"
-	"xcluster/internal/utils"
 )
 
 // Login authenticates the requested user, assign session if authentication success
 func Login(w http.ResponseWriter, r *http.Request) {
-	var err error
-	if err = r.ParseForm(); err != nil {
-		err = api.Write(w, api.Response{
-			Code:    http.StatusBadRequest,
-			Message: err.Error(),
-		})
-		logger.LogIfError(err)
+	if !filter.MatchMethod(w, r, http.MethodPost) {
 		return
 	}
+	if !filter.ParseForm(w, r) {
+		return
+	}
+	var err error
 	name := r.FormValue("name")
 	password := r.FormValue("password")
-	if utils.EmptyAny(name, password) {
-		err = api.Write(w, api.Response{
-			Code:    http.StatusBadRequest,
-			Message: "fields can not be empty",
-		})
-		logger.LogIfError(err)
+	if filter.FieldsEmpty(w, name, password) {
 		return
 	}
 	var u *user.User
@@ -63,7 +55,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// allocate session
-	l := session.NewLease(u.ID, options.SessionDuration)
+	l := session.NewLease(uint(u.ID), options.SessionDuration)
 	var s *session.Session
 	s, err = session.NewSession(l)
 	if err != nil {
@@ -76,20 +68,29 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		logger.LogIfError(err)
 		return
 	}
+	if _, err = user.SaveSession(s); err != nil {
+		err = fmt.Errorf("save user session failed, cause=%w", err)
+		logger.LogError(err)
+		err = api.Write(w, api.Response{
+			Code:    http.StatusInternalServerError,
+			Message: "save user session failed",
+		})
+		logger.LogIfError(err)
+		return
+	}
 	// set cookie
 	http.SetCookie(w, &http.Cookie{
 		Name:  "session",
 		Value: string(s.ID),
 		Path:  "/",
 		//Domain:     "",
-		Expires: s.Lease.ExpireTime,
+		Expires: s.Lease.ExpirationTime,
 	})
 	err = api.Write(w, api.Response{
 		Code:    http.StatusOK,
 		Message: "login success",
 	})
 	logger.LogIfError(err)
-	msg := fmt.Sprintf("session: %s (expiration %s) -> user: %s",
-		s.ID, s.Lease.ExpireTime.Format(time.DateTime), u.Name)
+	msg := fmt.Sprintf("%s -> user: %s", s.ShortString(), u.Name)
 	logger.Log(msg)
 }

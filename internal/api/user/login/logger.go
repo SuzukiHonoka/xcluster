@@ -1,5 +1,5 @@
 package login
 
-import "xcluster/internal/api"
+import "xcluster/internal/log"
 
-const logger = api.Logger("user/login")
+const logger = log.Logger("user/login")

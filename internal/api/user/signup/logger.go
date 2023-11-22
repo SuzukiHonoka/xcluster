@@ -1,5 +1,5 @@
 package signup
 
-import "xcluster/internal/api"
+import "xcluster/internal/log"
 
-const logger = api.Logger("user/signup")
+const logger = log.Logger("user/signup")
