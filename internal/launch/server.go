@@ -6,6 +6,7 @@ import (
 	"time"
 	"xcluster/internal/database"
 	"xcluster/internal/router"
+	"xcluster/internal/server"
 	"xcluster/internal/session"
 	"xcluster/internal/user"
 	"xcluster/pkg/redis"
@@ -27,7 +28,17 @@ func Server() {
 	if err = user.InitUserTable(); err != nil {
 		panic(err)
 	}
+	if err = user.InitUserSessionTable(); err != nil {
+		panic(err)
+	}
 	log.Println("user: init success")
+	if err = server.InitServerTable(); err != nil {
+		panic(err)
+	}
+	if err = server.InitGroupTable(); err != nil {
+		panic(err)
+	}
+	log.Println("server: init success")
 	// init server
 	r := router.NewRouter()
 	srv := &http.Server{
