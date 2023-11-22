@@ -17,7 +17,7 @@ var (
 
 var (
 	n     = 10
-	users []User
+	users Users
 )
 
 func init() {
@@ -33,13 +33,13 @@ func init() {
 	users = generateUsers(n)
 }
 
-func generateUsers(n int) []User {
-	t := make([]User, n)
+func generateUsers(n int) Users {
+	t := make(Users, n)
 	for i := range t {
-		t[i] = User{
+		t[i] = &User{
 			Name:     Name(randString(100)),
 			Password: Password(randString(100)),
-			Email:    randString(100),
+			Email:    Email(randString(100)),
 		}
 	}
 	return t
@@ -57,7 +57,7 @@ func randString(n int) string {
 func TestNewUser(t *testing.T) {
 	for _, user := range users {
 		//t.Logf("ID=%d, name=%s, password=%s, email=%s", user.ID, user.Name, user.Password, user.Email)
-		_, err := NewUser(string(user.Name), string(user.Password), user.Email)
+		_, err := NewUser(string(user.Name), string(user.Password), string(user.Email))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -65,7 +65,7 @@ func TestNewUser(t *testing.T) {
 }
 
 func TestGetAll(t *testing.T) {
-	all, err := GetAll()
+	all, err := All()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,7 +78,7 @@ func TestGetAll(t *testing.T) {
 }
 
 func TestID_GetUser(t *testing.T) {
-	all, err := GetAll()
+	all, err := All()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,7 +95,7 @@ func TestID_GetUser(t *testing.T) {
 }
 
 func TestName_GetUser(t *testing.T) {
-	all, err := GetAll()
+	all, err := All()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -112,20 +112,19 @@ func TestName_GetUser(t *testing.T) {
 }
 
 func TestUser_Update(t *testing.T) {
-	all, err := GetAll()
+	all, err := All()
 	if err != nil {
 		t.Fatal(err)
 	}
 	// set all field to val
 	for _, user := range all {
 		val := strconv.Itoa(int(user.ID))
-		p := &val
-		if err = user.Update(p, nil, nil); err != nil {
+		if err = user.Update(val, "", ""); err != nil {
 			t.Fatal(err)
 		}
 	}
 	// verify updates
-	all, err = GetAll()
+	all, err = All()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -138,7 +137,7 @@ func TestUser_Update(t *testing.T) {
 }
 
 func TestID_DeleteUser(t *testing.T) {
-	all, err := GetAll()
+	all, err := All()
 	if err != nil {
 		t.Fatal(err)
 	}

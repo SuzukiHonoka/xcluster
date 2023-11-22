@@ -1,9 +1,9 @@
 package user
 
-type Group uint
+type GroupID uint
 
 const (
-	GroupAdmin Group = iota
-	GroupUser
-	GroupBanned
+	GroupIDBanned GroupID = iota
+	GroupIDAdmin
+	GroupIDUser
 )
