@@ -8,12 +8,12 @@ import (
 )
 
 type Response struct {
-	Code    int           `json:"code"`
-	Message string        `json:"message"`
-	Data    []interface{} `json:"data,omitempty"`
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data,omitempty"` // note: use array as always
 }
 
-func NewResponse(code int, message string, data []interface{}) Response {
+func NewResponse(code int, message string, data interface{}) Response {
 	return Response{
 		Code:    code,
 		Message: message,
@@ -42,7 +42,7 @@ func (r Response) Byte() []byte {
 // Write writes response to the http.ResponseWriter
 // note that it will write the status code by use Response.Code since it uses standard http code for now
 func Write(w http.ResponseWriter, r Response) error {
-	// log ant writes
+	// log any writes
 	log.Println(r)
 	w.WriteHeader(r.Code)
 	return json.NewEncoder(w).Encode(r)

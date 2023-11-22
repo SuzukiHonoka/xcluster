@@ -1,10 +1,12 @@
-package utils
+package api
 
 import (
 	"net"
 	"net/http"
 	"strings"
 )
+
+// inspiration from https://gist.github.com/miguelmota/7b765edff00dc676215d6174f3f30216
 
 func RealIP(r *http.Request) string {
 	ips := r.Header.Get("X-Forwarded-For")

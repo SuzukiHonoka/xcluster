@@ -1,12 +1,9 @@
-package handler
+package api
 
 import (
 	"net/http"
 	"strings"
-	"xcluster/internal/api"
 )
-
-const PartNotFound = api.Logger("handler/notFound")
 
 func NotFound(w http.ResponseWriter, r *http.Request) {
 	if !strings.HasPrefix(r.URL.Path, "/api") {
@@ -14,9 +11,9 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	err := api.Write(w, api.Response{
+	err := Write(w, Response{
 		Code:    http.StatusNotFound,
 		Message: "api not found",
 	})
-	PartNotFound.LogIfError(err)
+	logger.LogIfError(err)
 }
