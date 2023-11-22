@@ -58,6 +58,10 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		logger.LogIfError(err)
 		return
 	}
+	// delete associated session
+	if !user.DeleteUserSessionsFromSession(w, r) {
+		return
+	}
 	// actual delete
 	if err = u.Delete(); err != nil {
 		err = fmt.Errorf("delete user failed, cause=%w", err)

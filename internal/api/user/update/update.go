@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"xcluster/internal/api"
 	userApi "xcluster/internal/api/user"
-	"xcluster/internal/user"
 )
 
 func update(w http.ResponseWriter, r *http.Request, sid, name, password, email string) bool {
@@ -37,35 +36,7 @@ func update(w http.ResponseWriter, r *http.Request, sid, name, password, email s
 	// check if change password
 	if password != "" {
 		// remove all session related to user
-		var userSessions user.Sessions
-		if userSessions, err = u.ID.GetSessions(); err != nil {
-			err = fmt.Errorf("get user sessions failed, cause=%w", err)
-			logger.LogError(err)
-			err = api.Write(w, api.Response{
-				Code:    http.StatusInternalServerError,
-				Message: "get user sessions failed",
-			})
-			logger.LogIfError(err)
-			return false
-		}
-		if err = userSessions.Invalidate(); err != nil {
-			err = fmt.Errorf("invalidate user sessions failed, cause=%w", err)
-			logger.LogError(err)
-			err = api.Write(w, api.Response{
-				Code:    http.StatusInternalServerError,
-				Message: "invalidate user sessions failed",
-			})
-			logger.LogIfError(err)
-			return false
-		}
-		if err = u.ID.DeleteSessions(); err != nil {
-			err = fmt.Errorf("delete user sessions failed, cause=%w", err)
-			logger.LogError(err)
-			err = api.Write(w, api.Response{
-				Code:    http.StatusInternalServerError,
-				Message: "delete user sessions failed",
-			})
-			logger.LogIfError(err)
+		if !userApi.DeleteUserSessionsFromSession(w, r) {
 			return false
 		}
 		cause := "password changed"
