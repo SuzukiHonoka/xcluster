@@ -3,24 +3,26 @@ package session
 import (
 	"encoding/json"
 	"time"
-	"xcluster/internal/user"
 )
 
 type Lease struct {
-	TenantID   user.ID
-	ExpireTime time.Time
+	TenantID       uint
+	CreationTime   time.Time
+	ExpirationTime time.Time
 }
 
-func NewLease(id user.ID, duration time.Duration) *Lease {
+func NewLease(id uint, duration time.Duration) *Lease {
+	now := time.Now()
 	return &Lease{
-		TenantID:   id,
-		ExpireTime: time.Now().Add(duration),
+		TenantID:       id,
+		CreationTime:   now,
+		ExpirationTime: now.Add(duration),
 	}
 }
 
 func (l *Lease) Expire() bool {
 	now := time.Now()
-	return now.Sub(l.ExpireTime) > 0
+	return now.Sub(l.ExpirationTime) > 0
 }
 
 // MarshalBinary is an implementation of encoding.BinaryMarshaler
