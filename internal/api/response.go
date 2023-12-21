@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 )
 
@@ -28,22 +27,13 @@ func (r Response) String() string {
 func (r Response) Byte() []byte {
 	b, err := json.Marshal(r)
 	if err != nil {
-		detail := fmt.Sprintf("response marshal failed, err=%s", err)
+		msg := fmt.Sprintf("response marshal failed, err=%s", err)
 		message := Response{
 			Code:    http.StatusInternalServerError,
-			Message: detail,
+			Message: msg,
 		}
-		log.Println("api:", detail)
+		//log.Println("api:", msg)
 		return message.Byte()
 	}
 	return b
-}
-
-// Write writes response to the http.ResponseWriter
-// note that it will write the status code by use Response.Code since it uses standard http code for now
-func Write(w http.ResponseWriter, r Response) error {
-	// log any writes
-	log.Println(r)
-	w.WriteHeader(r.Code)
-	return json.NewEncoder(w).Encode(r)
 }

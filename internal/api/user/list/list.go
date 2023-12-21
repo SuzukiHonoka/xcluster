@@ -9,7 +9,7 @@ import (
 	"xcluster/internal/user"
 )
 
-func List(w http.ResponseWriter, r *http.Request) {
+func ServeUserList(w http.ResponseWriter, r *http.Request) {
 	// get method only
 	if !filter.MatchMethod(w, r, http.MethodGet) {
 		return
@@ -29,7 +29,6 @@ func List(w http.ResponseWriter, r *http.Request) {
 		logger.LogIfError(err)
 		return
 	}
-	api.NewResponse(http.StatusOK, "get users success", all)
 	err = api.Write(w, api.Response{
 		Code:    http.StatusOK,
 		Message: "get users success",

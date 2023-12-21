@@ -6,7 +6,7 @@ import (
 	"xcluster/internal/api/filter"
 )
 
-func Self(w http.ResponseWriter, r *http.Request) {
+func ServeUserUpdateSelf(w http.ResponseWriter, r *http.Request) {
 	if !filter.MatchMethod(w, r, http.MethodPost) {
 		return
 	}

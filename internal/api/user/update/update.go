@@ -36,7 +36,7 @@ func update(w http.ResponseWriter, r *http.Request, sid, name, password, email s
 	// check if change password
 	if password != "" {
 		// remove all session related to user
-		if !userApi.DeleteUserSessionsFromSession(w, r) {
+		if !userApi.DeleteUserSessions(w, u.ID) {
 			return false
 		}
 		cause := "password changed"

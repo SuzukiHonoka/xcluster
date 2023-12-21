@@ -1,9 +1,13 @@
 package session
 
-import "xcluster/pkg/redis"
+import (
+	"context"
+	"xcluster/pkg/redis"
+)
 
-var store *Store
+var store Store
 
 func InitStore(client *redis.Client) {
-	store = NewStore(client)
+	// todo: use specific store according to configuration
+	store = NewRedisStore(context.Background(), client)
 }

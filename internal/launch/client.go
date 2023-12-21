@@ -1,5 +1,0 @@
-package launch
-
-func Client() {
-
-}

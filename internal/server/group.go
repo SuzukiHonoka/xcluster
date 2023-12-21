@@ -25,13 +25,16 @@ func NewGroup(id user.ID, name string) (*Group, error) {
 }
 
 func (g *Group) Delete() error {
-	servers, err := GetServers(g.ID)
-	if err != nil {
+	var err error
+	// delete token
+	if err = g.ID.DeleteTokens(); err != nil {
 		return err
 	}
-	if err = servers.Delete(); err != nil {
+	// cation, delete the server as well
+	if err = g.ID.DeleteServers(); err != nil {
 		return err
 	}
+	// actual delete the group
 	if err = g.ID.DeleteGroup(); err != nil {
 		return err
 	}
@@ -39,5 +42,5 @@ func (g *Group) Delete() error {
 }
 
 func (*Group) TableName() string {
-	return "servers_group"
+	return "server_group"
 }

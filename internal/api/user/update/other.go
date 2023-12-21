@@ -8,7 +8,7 @@ import (
 	"xcluster/internal/api/filter"
 )
 
-func Other(w http.ResponseWriter, r *http.Request) {
+func ServeUserUpdateOther(w http.ResponseWriter, r *http.Request) {
 	if !filter.MatchMethod(w, r, http.MethodPut) {
 		return
 	}

@@ -2,8 +2,15 @@ package main
 
 import (
 	"flag"
-	"xcluster/internal/launch"
+	"github.com/google/uuid"
+	"log"
+	"xcluster/internal/launcher"
 )
+
+func init() {
+	// use rand pool by default for better performance
+	uuid.EnableRandPool()
+}
 
 func main() {
 	server := flag.Bool("s", false, "server mode")
@@ -11,8 +18,12 @@ func main() {
 	flag.Parse()
 	switch {
 	case *server:
-		launch.Server()
+		serverLauncher := launcher.NewServer()
+		go serverLauncher.Launch()
+		serverLauncher.ListenForShutdown()
 	case *client:
-		launch.Client()
+		launcher.Client()
+	default:
+		log.Fatalln("You must need either specify server or client to run the xcluster.")
 	}
 }

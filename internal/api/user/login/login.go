@@ -10,8 +10,8 @@ import (
 	"xcluster/internal/user"
 )
 
-// Login authenticates the requested user, assign session if authentication success
-func Login(w http.ResponseWriter, r *http.Request) {
+// ServeUserLogin authenticates the requested user, assign session if authentication success
+func ServeUserLogin(w http.ResponseWriter, r *http.Request) {
 	if !filter.MatchMethod(w, r, http.MethodPost) {
 		return
 	}

@@ -7,7 +7,7 @@ import (
 	"xcluster/internal/api/filter"
 )
 
-func Logout(w http.ResponseWriter, r *http.Request) {
+func ServeUserLogout(w http.ResponseWriter, r *http.Request) {
 	if !filter.MatchMethod(w, r, http.MethodGet) {
 		return
 	}

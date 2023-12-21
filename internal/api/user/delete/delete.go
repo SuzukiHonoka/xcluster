@@ -10,7 +10,7 @@ import (
 	"xcluster/internal/server"
 )
 
-func Delete(w http.ResponseWriter, r *http.Request) {
+func ServeUserDelete(w http.ResponseWriter, r *http.Request) {
 	// post method only
 	if !filter.MatchMethod(w, r, http.MethodDelete) {
 		return
@@ -38,28 +38,18 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	// delete userID related
 	var serverGroups server.Groups
 	if serverGroups, err = server.GetGroups(u.ID); err != nil {
-		err = fmt.Errorf("get server group of user failed, cause=%w", err)
-		logger.LogError(err)
-		err = api.Write(w, api.Response{
-			Code:    http.StatusInternalServerError,
-			Message: "get server group of user failed",
-		})
-		logger.LogIfError(err)
+		msg := "get server group of user failed"
+		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
 		return
 	}
-	// will delete associated server as well
+	// delete associated server
 	if err = serverGroups.Delete(); err != nil {
-		err = fmt.Errorf("delete servers of group failed, cause=%w", err)
-		logger.LogError(err)
-		err = api.Write(w, api.Response{
-			Code:    http.StatusInternalServerError,
-			Message: "delete servers of group failed",
-		})
-		logger.LogIfError(err)
+		msg := "delete servers of group failed"
+		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
 		return
 	}
 	// delete associated session
-	if !user.DeleteUserSessionsFromSession(w, r) {
+	if !user.DeleteUserSessions(w, u.ID) {
 		return
 	}
 	// actual delete

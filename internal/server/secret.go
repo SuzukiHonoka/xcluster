@@ -1,35 +1,28 @@
 package server
 
 import (
-	"bytes"
-	"crypto/rand"
 	"crypto/sha256"
-	"encoding/base64"
+	"encoding/hex"
+	"xcluster/pkg/random"
 )
 
-const nonceLength = 8
+var nonceLength = 16 // adjustable
 
-type Secret []byte
+type Secret string // random string
 
-func NewRandomSecret() (string, Secret, error) {
-	nonce := make([]byte, nonceLength)
-	if _, err := rand.Read(nonce); err != nil {
-		return "", nil, err
-	}
+func GenerateSha256String(s string) string {
 	h := sha256.New()
-	h.Write(nonce)
-	hash := h.Sum(nil)
-	b64Nonce := base64.RawStdEncoding.EncodeToString(nonce)
-	return b64Nonce, hash, nil
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
 }
 
-func (s Secret) Compare(other string) (bool, error) {
-	b, err := base64.RawStdEncoding.DecodeString(other)
-	if err != nil {
-		return false, err
-	}
-	h := sha256.New()
-	h.Write(b)
-	hash := h.Sum(nil)
-	return bytes.Equal(s, hash), nil
+func NewRandomSecret() (string, Secret) {
+	s := random.ComplexString(nonceLength)
+	hash := GenerateSha256String(s)
+	return s, Secret(hash)
+}
+
+func (s Secret) Compare(other string) bool {
+	hash := GenerateSha256String(other)
+	return string(s) == hash
 }

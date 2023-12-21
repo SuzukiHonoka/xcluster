@@ -14,11 +14,6 @@ type Session struct {
 	Lease *Lease
 }
 
-func init() {
-	// use rand pool by default for stat
-	uuid.EnableRandPool()
-}
-
 func NewSession(lease *Lease) (*Session, error) {
 	// generate uuid
 	uid, err := uuid.NewRandom()

@@ -8,7 +8,7 @@ type Database struct {
 	*gorm.DB
 }
 
-func NewDatabase(config *Config, create bool) (*Database, error) {
+func NewDatabaseWrapper(config *Config, create bool) (*Database, error) {
 	if create {
 		// create database if not exist by using one-time connection
 		db, err := newDatabaseConnection(config, false)
@@ -35,4 +35,12 @@ func NewDatabase(config *Config, create bool) (*Database, error) {
 	return &Database{
 		DB: db,
 	}, nil
+}
+
+func (d *Database) Close() error {
+	db, err := d.DB.DB()
+	if err != nil {
+		return err
+	}
+	return db.Close()
 }

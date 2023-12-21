@@ -1,7 +1,6 @@
 package user
 
 import (
-	"fmt"
 	"net/http"
 	"xcluster/internal/api"
 	"xcluster/internal/user"
@@ -12,36 +11,25 @@ func DeleteUserSessionsFromSession(w http.ResponseWriter, r *http.Request) bool 
 	if !ok {
 		return false
 	}
+	return DeleteUserSessions(w, u.ID)
+}
+
+func DeleteUserSessions(w http.ResponseWriter, uid user.ID) bool {
 	var err error
 	var userSessions user.Sessions
-	if userSessions, err = u.ID.GetSessions(); err != nil {
-		err = fmt.Errorf("get user sessions failed, cause=%w", err)
-		logger.LogError(err)
-		err = api.Write(w, api.Response{
-			Code:    http.StatusInternalServerError,
-			Message: "get user sessions failed",
-		})
-		logger.LogIfError(err)
+	if userSessions, err = uid.GetSessions(); err != nil {
+		msg := "get user sessions failed"
+		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
 		return false
 	}
 	if err = userSessions.Invalidate(); err != nil {
-		err = fmt.Errorf("invalidate user sessions failed, cause=%w", err)
-		logger.LogError(err)
-		err = api.Write(w, api.Response{
-			Code:    http.StatusInternalServerError,
-			Message: "invalidate user sessions failed",
-		})
-		logger.LogIfError(err)
+		msg := "invalidate user sessions failed"
+		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
 		return false
 	}
-	if err = u.ID.DeleteSessions(); err != nil {
-		err = fmt.Errorf("delete user sessions failed, cause=%w", err)
-		logger.LogError(err)
-		err = api.Write(w, api.Response{
-			Code:    http.StatusInternalServerError,
-			Message: "delete user sessions failed",
-		})
-		logger.LogIfError(err)
+	if err = uid.DeleteSessions(); err != nil {
+		msg := "delete user sessions failed"
+		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
 		return false
 	}
 	return true

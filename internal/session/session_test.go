@@ -18,7 +18,10 @@ var (
 
 func init() {
 	config := redis.NewConfig(addr, password)
-	client := redis.NewRedis(config)
+	client, err := redis.NewRedisWrapper(config)
+	if err != nil {
+		panic(err)
+	}
 	InitStore(client)
 }
 

@@ -2,10 +2,10 @@ package user
 
 import (
 	"fmt"
-	"math/rand"
 	"strconv"
 	"testing"
 	"xcluster/internal/database"
+	"xcluster/pkg/random"
 )
 
 var (
@@ -37,21 +37,12 @@ func generateUsers(n int) Users {
 	t := make(Users, n)
 	for i := range t {
 		t[i] = &User{
-			Name:     Name(randString(100)),
-			Password: Password(randString(100)),
-			Email:    Email(randString(100)),
+			Name:     Name(random.String(100)),
+			Password: Password(random.String(100)),
+			Email:    Email(random.String(100)),
 		}
 	}
 	return t
-}
-
-func randString(n int) string {
-	var table = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@.")
-	s := make([]rune, n)
-	for i := range s {
-		s[i] = table[rand.Intn(len(table))]
-	}
-	return string(s)
 }
 
 func TestNewUser(t *testing.T) {

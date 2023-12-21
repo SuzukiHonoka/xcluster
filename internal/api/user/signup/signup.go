@@ -10,9 +10,9 @@ import (
 	"xcluster/internal/user"
 )
 
-// Signup a user and store it to database
+// ServeUserSignup signup a user and store it to database
 // only accept POST request
-func Signup(w http.ResponseWriter, r *http.Request) {
+func ServeUserSignup(w http.ResponseWriter, r *http.Request) {
 	var err error
 	// check request method
 	if !filter.MatchMethod(w, r, http.MethodPost) {

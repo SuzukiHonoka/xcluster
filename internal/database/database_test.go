@@ -17,7 +17,7 @@ var db *Database
 func TestNewDatabase(t *testing.T) {
 	config := NewConfig(databaseAddr, databaseUser, databasePassword, databaseName)
 	var err error
-	if db, err = NewDatabase(config, true); err != nil {
+	if db, err = NewDatabaseWrapper(config, true); err != nil {
 		t.Fatal(err)
 	}
 }

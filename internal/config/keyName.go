@@ -7,7 +7,7 @@ type KeyName string
 const (
 	KeyNameInstalled KeyName = "Installed"
 	KeyNameURL       KeyName = "URL"
-	KeyNameTitle
+	KeyNameTitle     KeyName = "Title"
 )
 
 func (k KeyName) GetConfig() (*Config, error) {

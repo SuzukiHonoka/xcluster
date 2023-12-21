@@ -16,7 +16,7 @@ func IsAdminFromSession(w http.ResponseWriter, r *http.Request) bool {
 }
 
 func IsAdmin(w http.ResponseWriter, u *user.User) bool {
-	if !u.Admin() {
+	if !u.IsAdmin() {
 		err := fmt.Errorf("user: %s (ID %d), trying to excced the user group permission", u.Name, u.ID)
 		logger.LogError(err)
 		err = api.Write(w, api.Response{

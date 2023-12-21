@@ -34,7 +34,7 @@ func NewUser(name, password, email string) (*User, error) {
 	return user, nil
 }
 
-func (u *User) Admin() bool {
+func (u *User) IsAdmin() bool {
 	return u.GroupID == GroupIDAdmin
 }
 
@@ -69,5 +69,5 @@ func (u *User) String() string {
 }
 
 func (*User) TableName() string {
-	return "users"
+	return "user"
 }
