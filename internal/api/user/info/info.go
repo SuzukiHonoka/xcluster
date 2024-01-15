@@ -15,10 +15,9 @@ func ServeUserInfo(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	err := api.Write(w, api.Response{
+	api.Write(w, api.Response{
 		Code:    http.StatusOK,
 		Message: "get user info success",
 		Data:    u,
 	})
-	logger.LogIfError(err)
 }

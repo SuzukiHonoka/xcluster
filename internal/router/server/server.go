@@ -30,7 +30,8 @@ func ApplyServerRoutes(authenticated, unauthenticated *mux.Router) {
 	tokenRouter.HandleFunc("/generate", serverTokenGenerate.ServeServerTokenGenerate)
 	tokenRouter.HandleFunc("/list/{gid:[0-9]+}", serverTokenList.ServeServerGroupTokenList)
 	tokenRouter.HandleFunc("/delete/{tid:[0-9]+}", serverTokenDelete.ServeServerTokenDelete)
-	// server websocket
+	// unauthenticated server
 	unauthenticatedServer := unauthenticated.PathPrefix("/server").Subrouter()
+	// websocket
 	unauthenticatedServer.HandleFunc("/control", serverControl.ServeServerControl)
 }

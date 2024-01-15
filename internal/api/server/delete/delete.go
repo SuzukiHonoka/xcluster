@@ -19,8 +19,7 @@ func ServeServerDelete(w http.ResponseWriter, r *http.Request) {
 	}
 	s, err := server.ID(fSid).GetServer()
 	if err != nil {
-		msg := "server not found"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "server not found", err)
 		return
 	}
 	// check if admin
@@ -33,26 +32,19 @@ func ServeServerDelete(w http.ResponseWriter, r *http.Request) {
 		// get server group
 		serverGroup, err := s.GroupID.GetGroup()
 		if err != nil {
-			msg := "server group not found"
-			api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+			api.WriteErrorAndLog(w, http.StatusInternalServerError, "server group not found", err)
 			return
 		}
 		// if not match
-		if !(serverGroup.User.ID == u.ID) {
-			msg := "server group does not belongs to you"
-			api.WriteErrorLog(w, http.StatusForbidden, msg, err)
+		if serverGroup.User.ID != u.ID {
+			api.WriteErrorAndLog(w, http.StatusForbidden, "server group user mismatch", err)
 			return
 		}
 	}
 	err = s.Delete()
 	if err != nil {
-		msg := "delete server failed"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "delete server failed", err)
 		return
 	}
-	err = api.Write(w, api.Response{
-		Code:    http.StatusOK,
-		Message: "delete server success",
-	})
-	logger.LogIfError(err)
+	api.Write(w, api.NewResponse(http.StatusOK, "delete server success", nil))
 }

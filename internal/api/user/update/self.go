@@ -4,24 +4,23 @@ import (
 	"net/http"
 	"xcluster/internal/api"
 	"xcluster/internal/api/filter"
+	userApi "xcluster/internal/api/user"
 )
 
 func ServeUserUpdateSelf(w http.ResponseWriter, r *http.Request) {
 	if !filter.MatchMethod(w, r, http.MethodPost) {
 		return
 	}
-	if !filter.ParseForm(w, r) {
+	u, ok := userApi.ParseUserFromSession(w, r)
+	if !ok {
 		return
 	}
-	name := r.FormValue("name")
-	password := r.FormValue("password")
-	email := r.FormValue("email")
-	if !update(w, r, "", name, password, email) {
+	data, ok := parseData(w, r)
+	if !ok {
 		return
 	}
-	err := api.Write(w, api.Response{
-		Code:    http.StatusOK,
-		Message: "update user success",
-	})
-	logger.LogIfError(err)
+	if !update(w, u, data.Name, data.Password, data.Email) {
+		return
+	}
+	api.Write(w, api.NewResponse(http.StatusOK, "update current user info success", nil))
 }

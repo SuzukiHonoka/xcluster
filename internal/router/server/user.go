@@ -7,13 +7,13 @@ import (
 	userList "xcluster/internal/api/user/list"
 	userLogin "xcluster/internal/api/user/login"
 	userLogout "xcluster/internal/api/user/logout"
-	userSignup "xcluster/internal/api/user/signup"
+	userRegister "xcluster/internal/api/user/register"
 	userUpdate "xcluster/internal/api/user/update"
 )
 
 func ApplyUserRoutes(authenticated, unauthenticated *mux.Router) {
 	unauthenticatedUser := unauthenticated.PathPrefix("/user").Subrouter()
-	unauthenticatedUser.HandleFunc("/signup", userSignup.ServeUserSignup)
+	unauthenticatedUser.HandleFunc("/register", userRegister.ServeUserRegister)
 	unauthenticatedUser.HandleFunc("/login", userLogin.ServeUserLogin)
 	//
 	authenticatedUser := authenticated.PathPrefix("/user").Subrouter()

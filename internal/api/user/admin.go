@@ -12,18 +12,16 @@ func IsAdminFromSession(w http.ResponseWriter, r *http.Request) bool {
 	if !ok {
 		return false
 	}
-	return IsAdmin(w, u)
+	if ok = IsAdmin(w, u); !ok {
+		w.WriteHeader(http.StatusForbidden)
+	}
+	return ok
 }
 
 func IsAdmin(w http.ResponseWriter, u *user.User) bool {
 	if !u.IsAdmin() {
-		err := fmt.Errorf("user: %s (ID %d), trying to excced the user group permission", u.Name, u.ID)
-		logger.LogError(err)
-		err = api.Write(w, api.Response{
-			Code:    http.StatusForbidden,
-			Message: "admin group required",
-		})
-		logger.LogIfError(err)
+		err := fmt.Errorf("%w: user=%s (ID %d)", api.ErrUserExceedGroupPermission, u.Name, u.ID)
+		api.WriteErrorAndLog(w, http.StatusForbidden, "admin group required", err)
 		return false
 	}
 	return true

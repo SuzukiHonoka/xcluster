@@ -47,3 +47,7 @@ func (s Session) ShortString() string {
 func (s Session) Delete() error {
 	return s.ID.DeleteSession()
 }
+
+func (s Session) Expired() bool {
+	return s.Lease.Expired()
+}

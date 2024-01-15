@@ -6,37 +6,39 @@ import (
 	"net/http"
 	"xcluster/internal/api"
 	"xcluster/internal/api/filter"
+	userApi "xcluster/internal/api/user"
 )
 
 func ServeUserUpdateOther(w http.ResponseWriter, r *http.Request) {
 	if !filter.MatchMethod(w, r, http.MethodPut) {
 		return
 	}
-	if !filter.ParseForm(w, r) {
+	u, ok := userApi.ParseUserFromSession(w, r)
+	if !ok {
 		return
 	}
-	var err error
+	// block request if not an admin
+	if !userApi.IsAdmin(w, u) {
+		return
+	}
 	vars := mux.Vars(r)
 	sid, ok := vars["id"]
 	if !ok {
-		err = api.Write(w, api.Response{
-			Code:    http.StatusBadRequest,
-			Message: "id not found",
-		})
-		logger.LogIfError(err)
+		api.WriteError(w, http.StatusBadRequest, api.ErrUserNotFound)
 		return
 	}
-	name := r.FormValue("name")
-	password := r.FormValue("password")
-	email := r.FormValue("email")
-	if !update(w, r, sid, name, password, email) {
+	data, ok := parseData(w, r)
+	if !ok {
 		return
 	}
-	err = api.Write(w, api.Response{
-		Code:    http.StatusOK,
-		Message: "update user success",
-	})
-	logger.LogIfError(err)
+	u, ok = userApi.ParseUserFromID(w, sid)
+	if !ok {
+		return
+	}
+	if !update(w, u, data.Name, data.Password, data.Email) {
+		return
+	}
+	api.Write(w, api.NewResponse(http.StatusOK, "update user success", u))
 	msg := fmt.Sprintf("user: id=%s updated", sid)
 	logger.Log(msg)
 }

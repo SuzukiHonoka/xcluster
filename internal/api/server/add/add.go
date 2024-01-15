@@ -9,6 +9,7 @@ import (
 	server2 "xcluster/internal/api/server"
 	"xcluster/internal/server"
 	"xcluster/pkg/random"
+	"xcluster/pkg/utils"
 )
 
 func ServeServerAdd(w http.ResponseWriter, r *http.Request) {
@@ -30,14 +31,12 @@ func ServeServerAdd(w http.ResponseWriter, r *http.Request) {
 	// get token and verify
 	token, err := server.TokenRaw(fToken).GetToken()
 	if err != nil {
-		msg := "token not exist"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "token not exist", err)
 		return
 	}
-	var ok bool
-	if ok, err = token.Validate(); !ok {
-		msg := "token invalid"
-		api.WriteErrorLog(w, http.StatusBadRequest, msg, err)
+	ok, err := token.Validate()
+	if !ok {
+		api.WriteErrorAndLog(w, http.StatusBadRequest, "token invalid", err)
 		return
 	}
 	// use remote IP as host addr and combine the port if addr field empty
@@ -45,11 +44,8 @@ func ServeServerAdd(w http.ResponseWriter, r *http.Request) {
 		// port field cannot be empty
 		if fPort == "" {
 			// reject
-			err = api.Write(w, api.Response{
-				Code:    http.StatusBadRequest,
-				Message: "missing server addr",
-			})
-			logger.LogIfError(err)
+			err = utils.AppendErrorInfo(api.ErrPayloadInvalid, "missing server addr")
+			api.WriteError(w, http.StatusBadRequest, err)
 			return
 		}
 		host := api.RealIP(r)
@@ -62,8 +58,7 @@ func ServeServerAdd(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	if _, err = token.UseCapacity(1); err != nil {
-		msg := "use token capacity failed"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "use token capacity failed", err)
 		return
 	}
 	// actual add
@@ -72,16 +67,10 @@ func ServeServerAdd(w http.ResponseWriter, r *http.Request) {
 	addr := server.Addr(fAddr)
 	bound, err := server.NewServer(name, addr, secret, token.GroupID)
 	if err != nil {
-		msg := "add server failed"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "add server failed", err)
 		return
 	}
 	// return backend URL, read IP,Port from config
 	boundData := server2.NewBound(bound.ServerID, secretRaw, "http://127.0.0.1:443/api/v1")
-	err = api.Write(w, api.Response{
-		Code:    http.StatusOK,
-		Message: "add server success",
-		Data:    boundData,
-	})
-	logger.LogIfError(err)
+	api.Write(w, api.NewResponse(http.StatusOK, "add server success", boundData))
 }

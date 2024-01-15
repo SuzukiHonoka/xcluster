@@ -42,9 +42,10 @@ func (u *User) Update(name, password, email string) error {
 	if name == "" && password == "" && email == "" {
 		return errors.New("all fields empty")
 	}
-	val := map[string]interface{}{}
+	val := make(map[string]interface{}, 3)
 	if name != "" {
 		val["user_name"] = name
+		u.Name = Name(name)
 	}
 	if password != "" {
 		hash, err := argon2.NewArgon2(nil).GenerateHashFromString(password)
@@ -55,6 +56,7 @@ func (u *User) Update(name, password, email string) error {
 	}
 	if email != "" {
 		val["user_email"] = email
+		u.Email = Email(email)
 	}
 	// optional: update receiver properties as well
 	return database.DB.Model(u).Updates(val).Error

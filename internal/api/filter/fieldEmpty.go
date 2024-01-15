@@ -8,8 +8,7 @@ import (
 
 func FieldsEmpty(w http.ResponseWriter, values ...string) bool {
 	if utils.EmptyAny(values) {
-		msg := "fields can not be empty"
-		api.WriteErrorLog(w, http.StatusBadRequest, msg, nil)
+		api.WriteError(w, http.StatusBadRequest, api.ErrPayloadNotFound)
 		return true
 	}
 	return false

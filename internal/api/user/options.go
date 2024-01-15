@@ -2,6 +2,15 @@ package user
 
 import "time"
 
-//var SessionDuration = 7 * 24 * time.Hour
+// SessionDuration defaults to 3 days
+var SessionDuration = 3 * 24 * time.Hour
 
-var SessionDuration = 10 * time.Minute
+var AllowRegister = true
+
+func setSessionDuration(duration time.Duration) {
+	SessionDuration = duration
+}
+
+func setAllowRegister(allow bool) {
+	AllowRegister = allow
+}

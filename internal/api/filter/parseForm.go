@@ -7,11 +7,7 @@ import (
 
 func ParseForm(w http.ResponseWriter, r *http.Request) bool {
 	if err := r.ParseForm(); err != nil {
-		err = api.Write(w, api.Response{
-			Code:    http.StatusBadRequest,
-			Message: err.Error(),
-		})
-		logger.LogError(err)
+		api.WriteError(w, http.StatusBadRequest, err)
 		return false
 	}
 	return true

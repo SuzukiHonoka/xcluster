@@ -20,7 +20,7 @@ func NewLease(id uint, duration time.Duration) *Lease {
 	}
 }
 
-func (l *Lease) Expire() bool {
+func (l *Lease) Expired() bool {
 	now := time.Now()
 	return now.Sub(l.ExpirationTime) > 0
 }

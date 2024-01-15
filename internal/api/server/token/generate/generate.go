@@ -44,21 +44,14 @@ func ServeServerTokenGenerate(w http.ResponseWriter, r *http.Request) {
 	}
 	if u.IsAdmin() {
 		if _, err = groupID.GetGroup(); err != nil {
-			err = api.Write(w, api.Response{
-				Code:    http.StatusBadRequest,
-				Message: "group id not exist",
-			})
-			logger.LogIfError(err)
+			api.WriteErrorAndLog(w, http.StatusBadRequest, "group id not exist", err)
 			return
 		}
 	} else {
 		ok, err = server.HasGroupID(u.ID, groupID)
 		if err != nil || !ok {
-			err = api.Write(w, api.Response{
-				Code:    http.StatusBadRequest,
-				Message: "group id not allowed or invalid",
-			})
-			logger.LogIfError(err)
+			//"group id not allowed or invalid"
+			api.WriteErrorAndLog(w, http.StatusBadRequest, "group verification failed", err)
 			return
 		}
 	}
@@ -67,13 +60,8 @@ func ServeServerTokenGenerate(w http.ResponseWriter, r *http.Request) {
 	var token *server.Token
 	if token, err = server.NewToken(groupID, tokenCapacity, duration); err != nil {
 		msg := "generate token failed"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, msg, err)
 		return
 	}
-	err = api.Write(w, api.Response{
-		Code:    http.StatusOK,
-		Message: "generate token success",
-		Data:    token,
-	})
-	logger.LogIfError(err)
+	api.Write(w, api.NewResponse(http.StatusOK, "generate token success", token))
 }

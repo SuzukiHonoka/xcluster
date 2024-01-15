@@ -7,10 +7,9 @@ import (
 type Logger string
 
 func (l Logger) LogIfError(err error) {
-	if err == nil {
-		return
+	if err != nil {
+		l.LogError(err)
 	}
-	l.LogError(err)
 }
 
 func (l Logger) LogError(err error) {

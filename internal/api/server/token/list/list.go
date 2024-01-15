@@ -3,7 +3,6 @@ package list
 import (
 	"github.com/gorilla/mux"
 	"net/http"
-	"strconv"
 	"xcluster/internal/api"
 	"xcluster/internal/api/filter"
 	"xcluster/internal/server"
@@ -17,24 +16,15 @@ func ServeServerGroupTokenList(w http.ResponseWriter, r *http.Request) {
 	if filter.FieldsEmpty(w, fGid) {
 		return
 	}
-	var err error
-	//
-	var id uint64
-	if id, err = strconv.ParseUint(fGid, 10, 32); err != nil {
-		api.WriteError(w, http.StatusBadRequest, err)
+	id, ok := api.ParseUint(w, fGid, 32)
+	if !ok {
 		return
 	}
 	gid := server.GroupID(id)
-	var tokens server.Tokens
-	if tokens, err = gid.GetTokens(); err != nil {
-		msg := "get tokens failed"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+	tokens, err := gid.GetTokens()
+	if err != nil {
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "get tokens failed", err)
 		return
 	}
-	err = api.Write(w, api.Response{
-		Code:    http.StatusOK,
-		Message: "get tokens success",
-		Data:    tokens,
-	})
-	logger.LogIfError(err)
+	api.Write(w, api.NewResponse(http.StatusOK, "get tokens success", tokens))
 }

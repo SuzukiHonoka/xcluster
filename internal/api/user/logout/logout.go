@@ -13,15 +13,9 @@ func ServeUserLogout(w http.ResponseWriter, r *http.Request) {
 	}
 	// parse session
 	session, _ := api.GetSession(r)
-	err := session.Delete()
-	if err != nil {
-		err = fmt.Errorf("delete session failed, cause=%w", err)
-		logger.LogError(err)
-		err = api.Write(w, api.Response{
-			Code:    http.StatusInternalServerError,
-			Message: "logout failed",
-		})
-		logger.LogIfError(err)
+	if err := session.Delete(); err != nil {
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "logout failed", err)
+		return
 	}
 	// set cookie
 	http.SetCookie(w, &http.Cookie{
@@ -30,11 +24,7 @@ func ServeUserLogout(w http.ResponseWriter, r *http.Request) {
 		Path:   "/",
 		MaxAge: -1, // invalidate now
 	})
-	err = api.Write(w, api.Response{
-		Code:    http.StatusOK,
-		Message: "logout success",
-	})
-	logger.LogIfError(err)
+	api.Write(w, api.NewResponse(http.StatusOK, "logout success", nil))
 	msg := fmt.Sprintln(session.ShortString(), "deleted")
 	logger.Log(msg)
 }

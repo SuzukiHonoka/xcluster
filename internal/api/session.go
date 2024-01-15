@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 	"xcluster/internal/session"
 )
@@ -16,13 +15,13 @@ func GetSession(r *http.Request) (*session.Session, error) {
 	}
 	val := cookie.Value
 	if val == "" {
-		return nil, errors.New("session field empty")
+		return nil, ErrSessionNotFound
 	}
 	id := session.ID(val)
-	var ss *session.Session
-	if ss, err = id.GetSession(); err != nil {
+	userSession, err := id.GetSession()
+	if err != nil {
 		return nil, err
 	}
 	// generally session will be deleted after the ttl in redis, we assume auto-delete works
-	return ss, nil
+	return userSession, nil
 }

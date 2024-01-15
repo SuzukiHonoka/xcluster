@@ -17,25 +17,17 @@ func ServeServerList(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		return
 	}
-	var err error
 	// get all groups from user
-	var groups server.Groups
-	if groups, err = server.GetGroups(u.ID); err != nil {
-		msg := "get server groups from user failed"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+	groups, err := server.GetGroups(u.ID)
+	if err != nil {
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "get server groups from user failed", err)
 		return
 	}
 	// get servers in each group
-	var servers server.Servers
-	if servers, err = groups.GetServers(); err != nil {
-		msg := "get servers from server groups failed"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+	servers, err := groups.GetServers()
+	if err != nil {
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "get servers from server groups failed", err)
 		return
 	}
-	err = api.Write(w, api.Response{
-		Code:    http.StatusOK,
-		Message: "get servers success",
-		Data:    servers,
-	})
-	logger.LogIfError(err)
+	api.Write(w, api.NewResponse(http.StatusOK, "get servers success", servers))
 }

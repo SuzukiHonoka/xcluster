@@ -15,21 +15,17 @@ func DeleteUserSessionsFromSession(w http.ResponseWriter, r *http.Request) bool 
 }
 
 func DeleteUserSessions(w http.ResponseWriter, uid user.ID) bool {
-	var err error
-	var userSessions user.Sessions
-	if userSessions, err = uid.GetSessions(); err != nil {
-		msg := "get user sessions failed"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+	userSessions, err := uid.GetSessions()
+	if err != nil {
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "get user sessions failed", err)
 		return false
 	}
 	if err = userSessions.Invalidate(); err != nil {
-		msg := "invalidate user sessions failed"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "invalidate user sessions failed", err)
 		return false
 	}
 	if err = uid.DeleteSessions(); err != nil {
-		msg := "delete user sessions failed"
-		api.WriteErrorLog(w, http.StatusInternalServerError, msg, err)
+		api.WriteErrorAndLog(w, http.StatusInternalServerError, "delete user sessions failed", err)
 		return false
 	}
 	return true

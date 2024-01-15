@@ -34,7 +34,7 @@ func NewServer() *Server {
 
 func (s *Server) Launch() {
 	// init redis
-	configRedis := redis.NewConfig("172.19.80.201:6379", "")
+	configRedis := redis.NewConfig("127.0.0.1:6379", "")
 	log.Println("redis: init")
 	redisWrapper, err := redis.NewRedisWrapper(configRedis)
 	if err != nil {
@@ -42,6 +42,7 @@ func (s *Server) Launch() {
 	}
 	defer utils.CloseAndPrintError(redisWrapper)
 	session.InitStore(redisWrapper)
+	//var err error
 	// init db
 	configDB := database.NewConfig("127.0.0.1:3306", "root", "root", "database_test")
 	log.Println("database: init")
